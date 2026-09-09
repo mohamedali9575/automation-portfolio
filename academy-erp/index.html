@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Academy ERP — Sessions, Hours & Subscriptions</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header>
+  <h1>🎓 Academy ERP</h1>
+  <p>Sessions • Hours per Session • Monthly Hours • 4-Session Subscriptions • Attendance & Payment</p>
+  <nav>
+    <button data-tab="dashboard" class="active">Dashboard</button>
+    <button data-tab="courses">Courses</button>
+    <button data-tab="students">Students</button>
+    <button data-tab="attendance">Attendance & Payments</button>
+    <button data-tab="help">Rules / Help</button>
+  </nav>
+</header>
+
+<main>
+  <!-- DASHBOARD -->
+  <section id="tab-dashboard" class="tab active">
+    <div class="cards" id="statsCards"></div>
+    <h2>Monthly Hours per Course</h2>
+    <div id="monthlySummary"></div>
+    <h2>Subscriptions expiring in 7 days / expired</h2>
+    <div id="expiringList"></div>
+  </section>
+
+  <!-- COURSES -->
+  <section id="tab-courses" class="tab">
+    <h2>Courses</h2>
+    <form id="courseForm" class="card form">
+      <input type="hidden" id="courseId" />
+      <label>Course name <input id="courseName" required placeholder="e.g. English A1" /></label>
+      <label>Hours per Session (set at start) <input id="courseHours" type="number" min="0.5" step="0.5" required placeholder="e.g. 2" /></label>
+      <label>First session date <input id="courseStart" type="date" required /></label>
+      <label>Session weekday
+        <select id="courseWeekday">
+          <option value="0">Sunday</option>
+          <option value="1">Monday</option>
+          <option value="2">Tuesday</option>
+          <option value="3">Wednesday</option>
+          <option value="4">Thursday</option>
+          <option value="5">Friday</option>
+          <option value="6">Saturday</option>
+        </select>
+      </label>
+      <label>Price per 4 sessions <input id="coursePrice" type="number" min="0" step="any" placeholder="e.g. 500" /></label>
+      <div class="row">
+        <button type="submit">Save course</button>
+        <button type="button" id="courseReset">Clear</button>
+      </div>
+    </form>
+    <div id="courseList"></div>
+  </section>
+
+  <!-- STUDENTS -->
+  <section id="tab-students" class="tab">
+    <h2>Students</h2>
+    <form id="studentForm" class="card form">
+      <input type="hidden" id="studentId" />
+      <label>Full name <input id="studentName" required placeholder="e.g. Ahmed Ali" /></label>
+      <label>Date of birth (age auto) <input id="studentDob" type="date" required /></label>
+      <label>Age (auto) <input id="studentAge" disabled /></label>
+      <label>Phone <input id="studentPhone" placeholder="01..." /></label>
+      <label>Course <select id="studentCourse"></select></label>
+      <label>Subscription start (first of the 4 sessions) <input id="studentSubStart" type="date" required /></label>
+      <div class="row">
+        <button type="submit">Save student</button>
+        <button type="button" id="studentReset">Clear</button>
+      </div>
+      <small>Subscription end = auto: start + 4 weekly sessions. +1 week extension if the 1 allowed excused absence is used.</small>
+    </form>
+    <div class="filters row">
+      <label>Filter by course <select id="filterCourse"><option value="">All</option></select></label>
+      <label>Search <input id="searchStudent" placeholder="name / phone" /></label>
+    </div>
+    <div id="studentList"></div>
+  </section>
+
+  <!-- ATTENDANCE -->
+  <section id="tab-attendance" class="tab">
+    <h2>Attendance & Payments</h2>
+    <div class="card form row">
+      <label>Course <select id="attCourse"></select></label>
+      <label>Session date <select id="attDate"></select></label>
+    </div>
+    <div id="attTable"></div>
+    <h3>Subscription cycles (pay every 4 sessions)</h3>
+    <div id="payTable"></div>
+  </section>
+
+  <!-- HELP -->
+  <section id="tab-help" class="tab">
+    <h2>Calculation rules (as you requested)</h2>
+    <ul>
+      <li><b>Hours per Session:</b> entered once when you create the course. Cannot change per session (keeps history clean).</li>
+      <li><b>1 session per week:</b> sessions auto-generate every 7 days from the course start date.</li>
+      <li><b>Total hours every month:</b> <code>sessionsInMonth × hoursPerSession</code>. Shown on Dashboard + per course.</li>
+      <li><b>Subscription:</b> every student pays every <b>4 sessions</b>.
+        Start date = you enter. End date = date of 4th session.
+        Example: start Mon 1 Sep → sessions 1,8,15,22 Sep → end = 22 Sep. Next cycle starts 29 Sep.</li>
+      <li><b>Absence rule:</b> each student has the right to <b>ONE excused absence per whole course</b>.
+        That session is NOT counted → subscription extends +1 week (end = 5th session date).
+        Any further absence is <b>counted as used/paid</b> → no extension.</li>
+      <li><b>Age:</b> auto-calculated from date of birth.</li>
+      <li><b>Status per student:</b> Present / Absent-excused / Absent-counted + Paid / Unpaid + subscription start/end + days left.</li>
+    </ul>
+    <div class="row">
+      <button id="exportBtn">Export JSON backup</button>
+      <label class="file">Import JSON <input type="file" id="importFile" accept=".json" /></label>
+      <button id="seedBtn">Load demo data</button>
+      <button id="wipeBtn" class="danger">Delete all data</button>
+    </div>
+  </section>
+</main>
+
+<footer><small>Data saved locally in browser (localStorage). Open <b>academy-erp/index.html</b> — no server needed.</small></footer>
+<script src="app.js"></script>
+</body>
+</html>
